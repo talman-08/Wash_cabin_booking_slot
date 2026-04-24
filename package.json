@@ -1,0 +1,17 @@
+{
+  "name": "wash_cabin_booking_slot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon server.js",
+    "client": "cd client && npm run dev"
+  },
+    "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
+
+ 

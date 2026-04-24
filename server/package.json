@@ -1,0 +1,24 @@
+{
+  "name": "wash_cabin_booking_slot",
+  "version": "1.0.0",
+  "description": "Booking slot app",
+  "repository": {
+    "type": "git",
+    "url": "wash_cabin_booking_slot"
+  },
+  "license": "ISC",
+  "author": "Daahir",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "Booking slot app"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0",
+    "mongoose": "^9.5.0",
+    "path": "^0.12.7"
+  }
+}
