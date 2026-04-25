@@ -2,35 +2,133 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [bookings, setBookings] = useState([]);
-  const [date, setDate] = useState("");
+  const [users, setUsers] = useState([]);
+  const [cabins, setCabins] = useState([]);
 
-  const fetchBookings = async () => {
-    const res = await fetch(`http://localhost:5000/api/bookings?date=${date}`);
-    const data = await res.json();
-    setBookings(data);
+  const [form, setForm] = useState({
+    userId: "",
+    cabinId: "",
+    date: "",
+    startTime: "",
+    endTime: ""
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const b = await fetch("http://localhost:8000/api/bookings");
+      const u = await fetch("http://localhost:8000/api/users");
+      const c = await fetch("http://localhost:8000/api/cabins");
+
+      setBookings(await b.json());
+      setUsers(await u.json());
+      setCabins(await c.json());
+
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to load data");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchBookings();
-
-    const interval = setInterval(fetchBookings, 5000);
-
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, [date]);
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.userId || !form.cabinId || !form.date || !form.startTime || !form.endTime) {
+      alert("All fields are required!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.message);
+        return;
+      }
+
+      setForm({
+        userId: "",
+        cabinId: "",
+        date: "",
+        startTime: "",
+        endTime: ""
+      });
+
+      fetchData();
+
+    } catch (err) {
+      console.error(err);
+      alert("Error creating booking");
+    }
+  };
+
+  const deleteBooking = async (id) => {
+    if (!window.confirm("Delete booking?")) return;
+
+    await fetch(`http://localhost:8000/api/bookings/${id}`, {
+      method: "DELETE"
+    });
+
+    fetchData();
+  };
 
   return (
     <div>
-      <h1>Wash Cabin Bookings</h1>
+      <h1>Wash Cabin Booking</h1>
 
-      <input
-        type="date"
-        onChange={(e) => setDate(e.target.value)}
-      />
+      <form onSubmit={handleSubmit}>
+        <select name="userId" value={form.userId} onChange={handleChange}>
+          <option value="">Select User</option>
+          {users.map((u) => (
+            <option key={u._id} value={u._id}>{u.name}</option>
+          ))}
+        </select>
+
+        <select name="cabinId" value={form.cabinId} onChange={handleChange}>
+          <option value="">Select Cabin</option>
+          {cabins.map((c) => (
+            <option key={c._id} value={c._id}>{c.cabinName}</option>
+          ))}
+        </select>
+
+        <input type="date" name="date" value={form.date} onChange={handleChange} />
+        <input type="time" name="startTime" value={form.startTime} onChange={handleChange} />
+        <input type="time" name="endTime" value={form.endTime} onChange={handleChange} />
+
+        <button type="submit">Book</button>
+      </form>
+
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
 
       <ul>
         {bookings.map((b) => (
           <li key={b._id}>
-            {b.date} | {b.startTime} - {b.endTime}
+            {b.userId?.name} | {b.cabinId?.cabinName} | {b.date} ({b.startTime}-{b.endTime})
+            <button onClick={() => deleteBooking(b._id)}>Delete</button>
           </li>
         ))}
       </ul>
@@ -39,139 +137,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import heroImg from './assets/hero.png'
-// import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <section id="center">
-//         <div className="hero">
-//           <img src={heroImg} className="base" width="170" height="179" alt="" />
-//           <img src={reactLogo} className="framework" alt="React logo" />
-//           <img src={viteLogo} className="vite" alt="Vite logo" />
-//         </div>
-//         <div>
-//           <h1>Get started</h1>
-//           <p>
-//             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-//           </p>
-//         </div>
-//         <button
-//           type="button"
-//           className="counter"
-//           onClick={() => setCount((count) => count + 1)}
-//         >
-//           Count is {count}
-//         </button>
-//       </section>
-
-//       <div className="ticks"></div>
-
-//       <section id="next-steps">
-//         <div id="docs">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#documentation-icon"></use>
-//           </svg>
-//           <h2>Documentation</h2>
-//           <p>Your questions, answered</p>
-//           <ul>
-//             <li>
-//               <a href="https://vite.dev/" target="_blank">
-//                 <img className="logo" src={viteLogo} alt="" />
-//                 Explore Vite
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://react.dev/" target="_blank">
-//                 <img className="button-icon" src={reactLogo} alt="" />
-//                 Learn more
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//         <div id="social">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#social-icon"></use>
-//           </svg>
-//           <h2>Connect with us</h2>
-//           <p>Join the Vite community</p>
-//           <ul>
-//             <li>
-//               <a href="https://github.com/vitejs/vite" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#github-icon"></use>
-//                 </svg>
-//                 GitHub
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://chat.vite.dev/" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#discord-icon"></use>
-//                 </svg>
-//                 Discord
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://x.com/vite_js" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#x-icon"></use>
-//                 </svg>
-//                 X.com
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://bsky.app/profile/vite.dev" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#bluesky-icon"></use>
-//                 </svg>
-//                 Bluesky
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//       </section>
-
-//       <div className="ticks"></div>
-//       <section id="spacer"></section>
-//     </>
-//   )
-// }
-
-// export default App

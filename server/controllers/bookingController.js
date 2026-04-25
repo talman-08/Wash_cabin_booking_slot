@@ -1,13 +1,37 @@
 import Booking from "../models/Booking.js";
 
-export const createBooking = async (req, res) => {
+ export const createBooking = async (req, res) => {
   try {
+    const { cabinId, date, startTime, endTime } = req.body;
+
+    const existing = await Booking.findOne({
+      cabinId,
+      date,
+      $or: [
+        {
+          startTime: { $lt: endTime },
+          endTime: { $gt: startTime }
+        }
+      ]
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        message: "This time slot is already booked!"
+      });
+    }
+
     const booking = await Booking.create(req.body);
     res.status(201).json(booking);
+
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
+
+
+
+
 
 export const getBookings = async (req, res) => {
   try {
