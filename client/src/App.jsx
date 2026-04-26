@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
   const [bookings, setBookings] = useState([]);
   const [users, setUsers] = useState([]);
   const [cabins, setCabins] = useState([]);
+
+  
+   
 
   const [form, setForm] = useState({
     userId: "",
@@ -15,6 +19,7 @@ function App() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const fetchData = async () => {
     try {
@@ -48,10 +53,8 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.userId || !form.cabinId || !form.date || !form.startTime || !form.endTime) {
-      alert("All fields are required!");
-      return;
-    }
+    setMessage("");
+    setError("");
 
     try {
       const res = await fetch("http://localhost:8000/api/bookings", {
@@ -65,9 +68,11 @@ function App() {
       const result = await res.json();
 
       if (!res.ok) {
-        alert(result.message);
+        setError(result.message); // 👈 show error in UI
         return;
       }
+
+      setMessage("Booking created successfully ✅");
 
       setForm({
         userId: "",
@@ -80,24 +85,31 @@ function App() {
       fetchData();
 
     } catch (err) {
-      console.error(err);
-      alert("Error creating booking");
+      setError("Something went wrong");
     }
   };
 
+ 
+ 
+
   const deleteBooking = async (id) => {
-    if (!window.confirm("Delete booking?")) return;
+    try {
+      await fetch(`http://localhost:8000/api/bookings/${id}`, {
+        method: "DELETE"
+      });
 
-    await fetch(`http://localhost:8000/api/bookings/${id}`, {
-      method: "DELETE"
-    });
-
-    fetchData();
+      setMessage("Booking deleted successfully 🗑️");
+      fetchData();
+    } catch {
+      setError("Delete failed");
+    }
   };
 
   return (
     <div>
       <h1>Wash Cabin Booking</h1>
+      {message && <p style={{ color: "green" }}>{message}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
         <select name="userId" value={form.userId} onChange={handleChange}>
