@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import BookingForm from "./components/BookingForm";
+import BookingList from "./components/BookingList";
 
 function App() {
   const [bookings, setBookings] = useState([]);
   const [users, setUsers] = useState([]);
   const [cabins, setCabins] = useState([]);
+
+
+
+  
 
   
    
@@ -111,39 +117,21 @@ function App() {
       {message && <p style={{ color: "green" }}>{message}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        <select name="userId" value={form.userId} onChange={handleChange}>
-          <option value="">Select User</option>
-          {users.map((u) => (
-            <option key={u._id} value={u._id}>{u.name}</option>
-          ))}
-        </select>
-
-        <select name="cabinId" value={form.cabinId} onChange={handleChange}>
-          <option value="">Select Cabin</option>
-          {cabins.map((c) => (
-            <option key={c._id} value={c._id}>{c.cabinName}</option>
-          ))}
-        </select>
-
-        <input type="date" name="date" value={form.date} onChange={handleChange} />
-        <input type="time" name="startTime" value={form.startTime} onChange={handleChange} />
-        <input type="time" name="endTime" value={form.endTime} onChange={handleChange} />
-
-        <button type="submit">Book</button>
-      </form>
+      <BookingForm
+        users={users}
+        cabins={cabins}
+        form={form}
+        setForm={setForm}
+        onSubmit={handleSubmit}
+      />
 
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
 
-      <ul>
-        {bookings.map((b) => (
-          <li key={b._id}>
-            {b.userId?.name} | {b.cabinId?.cabinName} | {b.date} ({b.startTime}-{b.endTime})
-            <button onClick={() => deleteBooking(b._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <BookingList
+        bookings={bookings}
+        onDelete={deleteBooking}
+      />
     </div>
   );
 }

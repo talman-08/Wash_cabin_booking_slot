@@ -1,33 +1,13 @@
 import { useState } from "react";
 
-function BookingForm({ users, cabins, onCreate }) {
-  const [form, setForm] = useState({
-    userId: "",
-    cabinId: "",
-    date: "",
-    startTime: "",
-    endTime: ""
-  });
+function BookingForm({ users, cabins, form, setForm, onSubmit }) {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    console.log("Submitting:", form); // DEBUG
-
-    if (!form.userId || !form.cabinId || !form.date || !form.startTime || !form.endTime) {
-      alert("All fields required!");
-      return;
-    }
-
-    onCreate(form);
-  };
-
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <select name="userId" value={form.userId} onChange={handleChange}>
         <option value="">Select User</option>
         {users.map(u => (
@@ -52,3 +32,5 @@ function BookingForm({ users, cabins, onCreate }) {
 }
 
 export default BookingForm;
+
+ 
