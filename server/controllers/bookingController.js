@@ -49,18 +49,7 @@ export const getBookings = async (req, res) => {
   }
 };
 
-export const updateBooking = async (req, res) => {
-  try {
-    const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    res.json(booking);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-};
+ 
 
 export const deleteBooking = async (req, res) => {
   try {
@@ -68,5 +57,27 @@ export const deleteBooking = async (req, res) => {
     res.json({ message: "Deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const updateBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updated = await Booking.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.json(updated);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

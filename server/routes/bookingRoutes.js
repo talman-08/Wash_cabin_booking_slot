@@ -6,8 +6,11 @@ import {
   deleteBooking
 } from "../controllers/bookingController.js";
 
+import { updateBooking } from "../controllers/bookingController.js";
+
 const router = express.Router();
 
+router.put("/:id", updateBooking);
 router.post("/", createBooking);
 router.get("/", getBookings);
 router.put("/:id", updateBooking);
