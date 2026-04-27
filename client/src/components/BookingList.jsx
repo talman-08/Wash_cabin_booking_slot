@@ -1,10 +1,15 @@
 import BookingItem from "./BookingItem";
 
-function BookingList({ bookings, onDelete }) {
+function BookingList({ bookings, onDelete, onEdit }) {
   return (
     <ul>
       {bookings.map((b) => (
-        <BookingItem key={b._id} booking={b} onDelete={onDelete} />
+        <BookingItem
+          key={b._id}
+          booking={b}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
       ))}
     </ul>
   );
