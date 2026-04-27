@@ -1,5 +1,8 @@
 # Wash Cabin Booking App
 
+## GitHub Repository
+https://github.com/talman-08/Wash_cabin_booking_slot
+
 ## Problem
 This app allows residents to book shared wash cabins by selecting date and time slots, avoiding scheduling conflicts.
 
